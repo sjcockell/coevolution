@@ -10,6 +10,7 @@ class GetSequence:
 	def __init__(self, gi_number=None):
 		"sets variables for instance"
 		print gi_number
+		self.gi = gi_number
 		handle = Entrez.efetch(db='protein', rettype='genbank', id=gi_number)
 		self.seq_record = SeqIO.read(handle, "genbank")
 		handle.close()
@@ -33,7 +34,8 @@ class GetSequence:
 		"writes sequence file in out/$UNIPROT.seq, fasta format"
 		self.records = []
 		self.records.append(self.seq_record)
-		self.filename = self.seq_record.id+".seq"
+		#self.filename = self.seq_record.id+".seq"
+		self.filename = self.gi+".seq"
 		output_handle = open('out/'+self.filename, "w")
 		SeqIO.write(self.records, output_handle, "fasta")
 		output_handle.close()
