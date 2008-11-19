@@ -1,6 +1,7 @@
 import os
 import sys
 from coevolution import GetSequence
+from Bio import SeqIO
 
 def run():
 	vapBs = []
@@ -18,16 +19,41 @@ def run():
 		acc2 = tokens[2]
 		vapBs.append(acc1)
 		vapCs.append(acc2)
-	for B in vapBs:
-		seq = GetSequence.GetSequence(B)
-		filename = "out/"+seq.get_sequence_id+".seq"
-		command = "cat "+filename+" >> vapB.fa"
+	n = len(vapBs)
+	i = 0
+#	while i < n:
+	while i < 50:
+		filename1 = "out/"+vapBs[i]+".seq"
+		filename2 = "out/"+vapCs[i]+".seq"
+		command = "cat "+filename1+" "+filename2+" > temp.fa"
 		os.system(command)
-	for C in vapCs:
-		seq = GetSequence.GetSequence(C)
-		filename = "out/"+seq.get_sequence_id+".seq"
-		command = "cat "+filename+" >> vapC.fa"
-		os.system(command)
+		han = open('temp.fa', "rU")
+		print ">"+vapBs[i]+"|"+vapCs[i]
+		j = 0
+		seq = ""
+		for rec in SeqIO.parse(han, "fasta"):
+			s = str(rec.seq)
+			s = s.rstrip()
+			seq = seq+s
+			j += 1
+		print seq
+		i += 1
+#	for B in vapBs:
+#		filename = "out/"+B+".seq"
+#	i = 0
+#	while i < 51:
+#		filename = "out/"+vapBs[i]+".seq"
+#		command = "cat "+filename+" >> vapB50.fa"
+#		os.system(command)
+#		i += 1
+#	for C in vapCs:
+#		filename = "out/"+C+".seq"
+#	i = 0
+#	while i < 51:
+#		filename = "out/"+vapCs[i]+".seq"
+#		command = "cat "+filename+" >> vapC50.fa"
+#		os.system(command)
+#		i += 1
 
 if __name__ == '__main__':
 	run()
