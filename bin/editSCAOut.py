@@ -90,6 +90,7 @@ def print_plotcmd(l,d,a):
 	plot('set xrange [0:'+str(l)+']')
 	plot('set yrange [0:'+str(l)+']')
 	plot('set tics out')
+	plot('set palette defined(0 "white", 1 "pink", 2 "red")')
 	plot.splot(data_test)
 	h = open('plt.cmd', 'w')
 	h.write("set terminal png\nset output 'plot.png'\nset view map\nset xrange [0:"+str(l)+"]\nset yrange [0:"+str(l)+"]\nset tics out\nsplot '"+d+"' w image\n")

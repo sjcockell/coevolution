@@ -2,11 +2,11 @@ import os
 import sys
 from coevolution import GetSequence
 
-def getAllSequences():
+def getAllSequences(file):
 	directory = os.getcwd()
-	data_directory = os.path.join(directory, "bin")
-	data_directory = os.path.join(data_directory, "data")
-	data_file = os.path.join(data_directory, "vapBC.gi")
+#	directory = os.path.join(directory, "bin")
+#	directory = os.path.join(directory, "data")
+	data_file = os.path.join(directory, file)
 	f = open(data_file, 'r')
 	lines = f.readlines()
 	for line in lines:
@@ -24,4 +24,8 @@ def getAllSequences():
 			seq2.write_sequence_file()
 
 if __name__ == '__main__':
-	getAllSequences()
+	try:
+		filename = sys.argv[1]
+	except IndexError:
+		filename = 'vapBC.gi'
+	getAllSequences(filename)
