@@ -13,12 +13,14 @@ def main():
 	gs.getAllSequences()
 	partnerAs = gs.getAList()
 	partnerBs = gs.getBList()
-	alignA = Alignment.Alignment(partnerAs)
+	alignA = Alignment.Align(partnerAs)
 	alignA.makeInfile('partner1.fa')
-	alignB = Alignment.Alignment(partnerBs)
+	alignB = Alignment.Align(partnerBs)
 	alignB.makeInfile('partner2.fa')
 	Alignment.AlignmentThread('partner1.fa', 'partner1.aln').start()
 	Alignment.AlignmentThread('partner2.fa', 'partner2.aln').start()
+	catAlign = Alignment.ConcatenateAlignment('partner1.aln', 'partner2.aln')
+	catAlign.padAlignment()
 
 if __name__ == '__main__':
 	main()
