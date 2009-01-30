@@ -55,3 +55,13 @@ class ConcatenateAlignment():
 		string = self.alignment
 		f.write(string)
 		f.close()
+
+class FormatAlignment():
+	def __init__(self, align_file, outfile):
+		self.alignment = Bio.AlignIO.read(open(align_file), "fasta")
+		self.out_handle = open(outfile, "w")
+	def format(self):
+		for record in self.alignment:
+			self.out_handle.write(record.id+"\t")
+			self.out_handle.write(str(record.seq)+"\n")
+		self.out_handle.close()
