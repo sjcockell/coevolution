@@ -65,3 +65,11 @@ class FormatAlignment():
 			self.out_handle.write(record.id+"\t")
 			self.out_handle.write(str(record.seq)+"\n")
 		self.out_handle.close()
+
+class ScreenAlignment():
+	def __init__(self, align_file, outfile):
+		self.alignment = Bio.AlignIO.read(open(align_file), "fasta")
+		self.outhandle = open(outfile, "w")
+		self.alignarray = []
+		for record in self.alignment:
+			alignarray.push(record.seq)
