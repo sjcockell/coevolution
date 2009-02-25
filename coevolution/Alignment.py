@@ -1,6 +1,9 @@
 import os
 import threading
 import Bio.AlignIO
+import Bio.Seq
+import re
+from scipy import *
 
 class Align:
 	def __init__(self, seq_list):
@@ -60,10 +63,39 @@ class FormatAlignment():
 	def __init__(self, align_file, outfile):
 		self.alignment = Bio.AlignIO.read(open(align_file), "fasta")
 		self.out_handle = open(outfile, "w")
+		self.pattern = re.compile('[BJOUXZ]')
+	def editBlankColumns(self):
+		length = len(self.alignment[0].seq)
+		position = zeros(length)
+		for record in self.alignment:
+			match = self.pattern.search(str(record.seq))
+			if match:
+				pass
+			else:
+				index = 0
+				for char in record.seq:
+					if char != '-':
+						position[index] = 1
+					index += 1
+		for record in self.alignment:
+			place = 0
+			tmpSeq = ''
+			for pos in position:
+				if pos == 1:
+					tmpSeq = tmpSeq+record.seq[place]
+				if pos == 0:
+					if record.seq[place] != '-':
+						print '(!)\tYou appear to be omitting a non-gap character from this sequence'
+				place += 1
+			record.seq = tmpSeq 
 	def format(self):
 		for record in self.alignment:
-			self.out_handle.write(record.id+"\t")
-			self.out_handle.write(str(record.seq)+"\n")
+			match = self.pattern.search(str(record.seq))
+			if match:
+				print "(!)\tSequence "+record.id+" contains invalid characters, omitting"
+			else:
+				self.out_handle.write(record.id+"\t")
+				self.out_handle.write(str(record.seq)+"\n")
 		self.out_handle.close()
 
 class ScreenAlignment():

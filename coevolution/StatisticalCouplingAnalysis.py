@@ -42,6 +42,7 @@ class StatisticalCouplingAnalysis:
 
 	def print_result(self, scores, file):
 		outname = file+'.ed'
+		print outname
 		handle = open(outname, 'w')
 		lastI = 0
 		for score in scores:
@@ -62,10 +63,8 @@ class StatisticalCouplingAnalysis:
 		handle.close()
 		lines.pop(0)
 		l = len(lines)
-		print l
 		factor = l * -2
 		limit = self.quadratic(factor)
-		print limit
 		limit_sq = limit ** 2
 		array = numpy.empty((limit_sq, 3))
 		a = 0
