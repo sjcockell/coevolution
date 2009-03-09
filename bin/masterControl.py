@@ -1,5 +1,5 @@
 import sys
-import getSequences
+import getSequences, assessSequences
 from coevolution import Alignment, StatisticalCouplingAnalysis
 
 def reportProgress(index):
@@ -9,7 +9,8 @@ def reportProgress(index):
 				"Concatenating alignments",
 				"Formatting alignment for Statistical Coupling Analysis",
 				"Performing SCA",
-				"Editing SCA output for Gnuplot"
+				"Editing SCA output for Gnuplot",
+				"Plotting SCA results",
 				]
 	print "(o)\t"+progressList[index]
 
@@ -26,28 +27,43 @@ def main():
 	al = gs.getAssociationList()
 	partnerAs = gs.getAList()
 	partnerBs = gs.getBList()
+	excludeList = assessSequences.excludeSeqs(al)
+	excludeA = []
+	excludeB = []
+	for ex in excludeList:
+		excludeA.append(ex[0])
+		excludeB.append(ex[1])
 	reportProgress(1)
 	alignA = Alignment.Align(partnerAs)
-	alignA.makeInfile('partner1.fa')
+	alignA.makeInfile('partner1ed.fa', excludeA)
 	alignB = Alignment.Align(partnerBs)
-	alignB.makeInfile('partner2.fa')
+	alignB.makeInfile('partner2ed.fa', excludeB)
 	reportProgress(2)
-	#Alignment.AlignmentThread('partner1.fa', 'partner1.aln').start()
-	#Alignment.AlignmentThread('partner2.fa', 'partner2.aln').start()
+	threads = []
+	thread1 = Alignment.AlignmentThread('partner1ed.fa', 'partner1ed.aln')
+	thread2 = Alignment.AlignmentThread('partner2ed.fa', 'partner2ed.aln')
+	threads.append(thread1)
+	threads.append(thread2)
+	for thread in threads:
+		thread.start()
+	for thread in threads:
+		thread.join()
 	reportProgress(3)
-	catAlign = Alignment.ConcatenateAlignment('partner1.aln', 'partner2.aln', al)
+	catAlign = Alignment.ConcatenateAlignment('partner1ed.aln', 'partner2ed.aln', al)
 	catAlign.padAlignment()
 	catted = catAlign.concatenate()
-	catAlign.writeResult('catted1.aln')
+	catAlign.writeResult('catteded.aln')
 	reportProgress(4)
-	formAlign = Alignment.FormatAlignment('catted1.aln', 'f_catted1.aln')
+	formAlign = Alignment.FormatAlignment('catteded.aln', 'f_catteded.aln')
 	formAlign.editBlankColumns()
 	formAlign.format()
 	reportProgress(5)
-	sca = StatisticalCouplingAnalysis.StatisticalCouplingAnalysis('f_catted1.aln')
-	sca.doSCA('vapbc.sca')
+	sca = StatisticalCouplingAnalysis.StatisticalCouplingAnalysis('f_catteded.aln')
+	sca.doSCA('edvapbc.sca')
 	reportProgress(6)
-	sca.editSCAOut('vapbc.sca')
+	sca.editSCAOut('edvapbc.sca')
+	reportProgress(7)
+	sca.plotSCA()
 
 if __name__ == '__main__':
 	main()

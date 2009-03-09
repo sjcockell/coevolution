@@ -64,9 +64,9 @@ class StatisticalCouplingAnalysis:
 		lines.pop(0)
 		l = len(lines)
 		factor = l * -2
-		limit = self.quadratic(factor)
-		limit_sq = limit ** 2
-		array = numpy.empty((limit_sq, 3))
+		self.limit = self.quadratic(factor)
+		limit_sq = self.limit ** 2
+		self.array = numpy.empty((limit_sq, 3))
 		a = 0
 		i1 = 0
 		j1 = 0
@@ -82,7 +82,7 @@ class StatisticalCouplingAnalysis:
 				while i1 <= i:
 					while j1 < j:
 						try:
-							array[a] = [i1, j1, 0.0]
+							self.array[a] = [i1, j1, 0.0]
 						except IndexError:
 							print a, i, i1, j, j1
 							exit()
@@ -90,11 +90,26 @@ class StatisticalCouplingAnalysis:
 						a += 1
 					j1 = 0
 					i1 += 1
-			array[a] = [i, j, score]
+			self.array[a] = [i, j, score]
 			a += 1
 		while a < limit_sq:
-			array[a] = [i1, j1, 0.0]
+			self.array[a] = [i1, j1, 0.0]
 			j1 += 1
 			a += 1
-		data = self.print_result(array, scaFile)
+		data = self.print_result(self.array, scaFile)
 		return data
+	
+	def plotSCA(self):
+		data_test = Gnuplot.Data(self.array, with='image')
+		plot = Gnuplot.Gnuplot()
+		plot('set terminal png')
+		plot('set output "ploted.png"')
+		plot('set view map')
+		plot('set xrange [0:'+str(self.limit)+']')
+		plot('set yrange [0:'+str(self.limit)+']')
+		plot('set tics out')
+		plot('set palette defined(0 "white", 1 "pink", 2 "red")')
+		plot.splot(data_test)
+#		h = open('plt.cmd', 'w')
+#		h.write("set terminal png\nset output 'plot.png'\nset view map\nset xrange [0:"+str(l)+"]\nset yrange [0:"+str(l)+"]\nset tics out\nsplot '"+d+"' w image\n")
+#		h.close()

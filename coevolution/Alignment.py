@@ -9,10 +9,15 @@ class Align:
 	def __init__(self, seq_list):
 		self.sl = seq_list
 
-	def makeInfile(self, infile):
+	def makeInfile(self, infile, exc_list):
 		for seq in self.sl:
-			command = 'cat out/' + seq + '.seq >> ' + infile
-			os.system(command)
+			exclude = 0
+			for e in exc_list:
+				if seq == e:
+					exclude = 1
+			if exclude == 0:
+				command = 'cat out/' + seq + '.seq >> ' + infile
+				os.system(command)
 	
 class AlignmentThread(threading.Thread):
 	def __init__(self, infile, outfile):
@@ -23,7 +28,7 @@ class AlignmentThread(threading.Thread):
 	def run(self):
 		command = 'muscle -in ' + self.infile + ' -out ' + self.outfile
 		print command
-		#os.system(command)
+		os.system(command)
 
 class ConcatenateAlignment():
 	def __init__(self, first, second, associations):
@@ -63,6 +68,7 @@ class FormatAlignment():
 	def __init__(self, align_file, outfile):
 		self.alignment = Bio.AlignIO.read(open(align_file), "fasta")
 		self.out_handle = open(outfile, "w")
+		self.fasta_out_handle = open('edited_align.fa', "w")
 		self.pattern = re.compile('[BJOUXZ]')
 	def editBlankColumns(self):
 		length = len(self.alignment[0].seq)
@@ -96,6 +102,8 @@ class FormatAlignment():
 			else:
 				self.out_handle.write(record.id+"\t")
 				self.out_handle.write(str(record.seq)+"\n")
+				self.fasta_out_handle.write(">"+record.id+"\n")
+				self.fasta_out_handle.write(str(record.seq)+"\n")
 		self.out_handle.close()
 
 class ScreenAlignment():
